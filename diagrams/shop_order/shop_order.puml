@@ -1,0 +1,19 @@
+@startuml
+
+skinparam sequenceMessageAlign center
+actor "Customer" as customer
+participant "Web UI" as UI
+participant "Order controller" as OC
+participant "Payment Service" as PS
+database Database as DB
+
+customer -> UI : makeOrder(orderData)
+UI -> OC : processOrder(orderData)
+OC -> DB : saveOrder(orderData)
+DB --> OC : orderSaved
+OC -> PS : processPayment(paymentData)
+PS --> OC : paymentResult
+OC --> UI : orderConfirmation(confirmationData)
+UI --> customer : displayConfirmation(confirmationData)
+
+@enduml
