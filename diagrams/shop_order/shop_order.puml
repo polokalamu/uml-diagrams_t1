@@ -6,6 +6,7 @@ participant "Web UI" as UI
 participant "Order controller" as OC
 participant "Payment Service" as PS
 database Database as DB #FFD700
+participant "Notification Service" as NS
 
 activate customer
 group 1. Оформление заказа
@@ -16,6 +17,7 @@ activate OC
 OC -> DB : saveOrder(orderData)
 activate DB
 DB --[#green]> OC : orderSaved
+note right DB : Заказ сохранен в статусе "Ожидает оплаты"
 deactivate DB
 end
 
@@ -26,15 +28,37 @@ alt Успешная оплата
 PS --[#green]> OC : paymentSuccess(confiramtionData)
 else Ошибка оплаты
 PS --[#red]> OC : paymentFailure(failureMessage)
+note right OC : Заказ сохраняется как предварительный
 end
 deactivate PS
 
-
+group 3. Подтверждение заказа
 OC --> UI : orderConfirmation(confirmationData)
 deactivate OC
 UI --> customer : displayConfirmation(confirmationData)
 deactivate UI
+end
 
+group 4. Изменение корзины (опционально)
+customer -> UI : changeOrder(itemData)
+activate UI
+note right UI : Добавление, удаление, изменение кол-ва
+UI -> OC : updateCart(itemData)
+activate OC
+OC -> DB : updateCartInDb(itemData)
+activate DB
+DB --[#green]> OC : cartSaved
+deactivate DB
+OC --> UI : cartUpdateNotify
+deactivate OC
+UI --> customer : showUpdatedCart
+deactivate UI
+end
+
+group 5. Уведомление менеджера
+NS -[#LightBlue]>> UI : managerNotification(orderID, status)
+note right UI : Менеджер получает уведомление о новом заказе
+end
 
 deactivate customer
 @enduml
