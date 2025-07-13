@@ -1,19 +1,40 @@
 @startuml
 
 skinparam sequenceMessageAlign center
-actor "Customer" as customer
+actor "Customer" as customer #LightBlue
 participant "Web UI" as UI
 participant "Order controller" as OC
 participant "Payment Service" as PS
-database Database as DB
+database Database as DB #FFD700
 
+activate customer
+group 1. Оформление заказа
 customer -> UI : makeOrder(orderData)
+activate UI
 UI -> OC : processOrder(orderData)
+activate OC
 OC -> DB : saveOrder(orderData)
-DB --> OC : orderSaved
-OC -> PS : processPayment(paymentData)
-PS --> OC : paymentResult
-OC --> UI : orderConfirmation(confirmationData)
-UI --> customer : displayConfirmation(confirmationData)
+activate DB
+DB --[#green]> OC : orderSaved
+deactivate DB
+end
 
+group 2. Оплата
+OC -> PS : processPayment(paymentData)
+activate PS
+alt Успешная оплата
+PS --[#green]> OC : paymentSuccess(confiramtionData)
+else Ошибка оплаты
+PS --[#red]> OC : paymentFailure(failureMessage)
+end
+deactivate PS
+
+
+OC --> UI : orderConfirmation(confirmationData)
+deactivate OC
+UI --> customer : displayConfirmation(confirmationData)
+deactivate UI
+
+
+deactivate customer
 @enduml
