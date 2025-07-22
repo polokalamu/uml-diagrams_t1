@@ -1,0 +1,37 @@
+@startuml
+
+abstract class Payment {
+  - amount : decimal
+  - paymentDate : timestamp
+  - transactionId : UUID
+  + processPayment() : void
+  + getAmount() : decimal
+  + getPaymentDate() : timestamp
+  + getTransactionId() : string
+}
+
+class CashPayment {
+  - cashProvided : decimal
+  + calculateChange() : decimal
+  + processPayment() : void
+}
+
+class CardPayment {
+  - cardNumber : string
+  - cardHolderName : string
+  - expiryDate : Date
+  + validateCard() : boolean
+  + processPayment(): void
+}
+
+class PaymentManager {
+  - payments : List<Payment>
+  + addPayment(p : Payment) : void
+  + processAllPayments() : void
+}
+
+Payment <|-- CashPayment
+Payment <|-- CardPayment
+PaymentManager "1" o-- "*" Payment
+
+@enduml
