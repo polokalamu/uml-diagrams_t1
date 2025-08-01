@@ -1,0 +1,75 @@
+@startuml
+
+class User {
+  - userId : uuid
+  - username : string
+  - email : string
+  - registrationDate : date
+  - account : <<reference>> Account
+  + getUserData() : string
+}
+
+class Student {
+  - studentId : uuid
+  - name : string
+}
+
+class Instructor {
+  - instructorId : uuid
+  - name : string
+}
+
+class Account {
+  - accountId : uuid
+  - bio : String
+  + getAccountData() : string
+}
+
+class Course {
+  - courseId : uuid
+  - courseName : string
+}
+
+class Module {
+  - moduleId : string
+  - moduleName : string
+  - summary : string
+}
+
+class Material {
+  - materialId : uuid
+  - materialName : string
+  + getMaterial() : string
+}
+
+
+class Enrollment {
+  - enrollmentDate : date
+  - grade : string
+}
+
+class Payment {
+  + processPayment() : bool
+}
+
+Student --|> User : "наследование: студент — подтип пользователя"
+
+Instructor --|> User : "наследование: преподаватель — подтип пользователя"
+
+User "1" --> "0..1" Account : "у пользователя есть аккаунт (ассоциация, 0..1)"
+
+Student "1" -- "0..*" Enrollment : "зачисление (ассоциация, 0..*)"
+
+Enrollment "1" -- "1" Course : "зачисление на конкретный курс (ассоциация, 1)"
+
+Course ..> Payment : "курс зависит от оплаты"
+
+User ..> Payment : "пользователь инициирует платеж (зависимость)"
+
+Instructor "0..*" -- "0..*" Course : "разные преподаватели могут вести разные курсы"
+
+Course "1" *-- "1..*" Module : "состоит из модулей (композиция)"
+
+Module "1" *-- "1..*" Material : "модуль содержить материалы (композиция)"
+
+@enduml
