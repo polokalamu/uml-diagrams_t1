@@ -3,9 +3,12 @@ left to right direction
 skinparam packageStyle rectangle
 
 actor Client as "Клиент"
+actor vipClient as "ВИП клиент"
 actor CreditManager as "Кредитный менеджер"
 actor SecurityService as "Служба безопасности"
 actor BKI as "БКИ"
+
+Client <|-- vipClient
 
 rectangle "Рассмотрение кредитной заявки" {
 (Подать заявку) as UC1
@@ -17,6 +20,7 @@ rectangle "Рассмотрение кредитной заявки" {
 }
 
 Client --> UC1
+vipClient -left-> UC1: Ускоренная подача
 UC1 .> UC2: <<include>>
 CreditManager --> UC2
 UC2 ..> UC3: <<include>>
