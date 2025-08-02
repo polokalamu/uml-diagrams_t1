@@ -1,0 +1,29 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Client as "Клиент"
+actor CreditManager as "Кредитный менеджер"
+actor SecurityService as "Служба безопасности"
+actor BKI as "БКИ"
+
+rectangle "Рассмотрение кредитной заявки" {
+(Подать заявку) as UC1
+(Рассмотреть заявку) as UC2
+(Проверка службы безопасности) as UC3
+(Запрос кредитной истории) as UC4
+(Одобрить кредит) as UC5
+(Отклонить кредит) as UC6
+}
+
+Client --> UC1
+UC1 .> UC2: <<include>>
+CreditManager --> UC2
+UC2 ..> UC3: <<include>>
+UC2 ..> UC4: <<include>>
+UC3 --> SecurityService: Запрос проверки
+UC4 --> BKI: Запрос КИ
+UC2 ..> UC5: include <<при успешной проверке>>
+UC2 <.. UC6: <<extends>>
+
+@enduml
