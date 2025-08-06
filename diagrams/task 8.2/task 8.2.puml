@@ -1,0 +1,61 @@
+@startuml
+title Процесс онлайн-перевода между счетами
+
+actor "Клиент" as Client
+participant "Мобильное приложение" as App
+participant "Бэкенд" as Backend
+database "База данных" as DB
+participant "СМС-сервис" as SMS
+
+Client -> App: Инициирует перевод (ввод суммы, счета получателя)
+
+activate App
+App -> Backend: Запрос на перевод
+
+activate Backend
+Backend -> DB: Запрос баланса счета
+
+activate DB
+DB --> Backend: Вернуть баланс
+deactivate DB
+
+alt Достаточно средств на счете
+par
+Backend --> App: Сообщение "Требуется подтверждение СМС-кодом"
+Backend ->> SMS: Отправить СМС-код для подтверждения
+activate SMS
+end
+
+SMS -->> Client: СМС с кодом подтверждения
+deactivate SMS
+
+Client -> App: Вводит код из СМС
+App -> Backend: Подтверждение операции
+Backend -> DB: Списать средства со счета
+
+activate DB
+DB --> Backend: Подтверждение списания
+deactivate DB
+
+Backend -> DB: Зачислить средства на счет
+
+activate DB
+DB --> Backend: Подтверждение зачисления
+deactivate DB
+
+Backend --> App: Ответ: перевод успешно выполнен
+App --> Client: Показать сообщение об успехе
+
+else Недостаточно средств
+Backend --> App: Ошибка: недостаточно средств
+deactivate Backend
+
+App --> Client: Показать сообщение об ошибке
+end
+
+opt Повтор перевода
+App -> Client: Сообщение: "Повторить перевод?"
+end
+deactivate App
+
+@enduml
